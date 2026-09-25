@@ -1,5 +1,10 @@
-crewai==1.15.5
-litellm>=1.60.0
-ddgs>=9.0.0,<10.0.0
-streamlit>=1.40.0,<2.0.0
-python-dotenv>=1.0.1
+```text
+streamlit
+crewai
+crewai-tools
+groq
+litellm
+python-dotenv
+ddgs
+```
+
