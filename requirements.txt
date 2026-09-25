@@ -1,10 +1,8 @@
 ```text
 streamlit
-crewai
-crewai-tools
-groq
-litellm
+crewai==1.15.22
+ddgs==9.16.0
 python-dotenv
-ddgs
 ```
+
 
