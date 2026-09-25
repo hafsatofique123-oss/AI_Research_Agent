@@ -1,11 +1,14 @@
+```python
 """
-This file defines our single-agent research crew:
-- one Agent (a "Research Analyst")
-- one Task (write a report on a topic)
-- one Crew that runs that task
+AI Research Agent
 
-The agent "thinks" using a Groq-hosted model, and can search the web
-with the DuckDuckGo tool defined in search_tool.py.
+This file defines:
+- One Research Analyst agent
+- One research task
+- One Crew
+
+The agent uses Groq's GPT-OSS 120B model and
+a DuckDuckGo-based web search tool.
 """
 
 import os
@@ -15,32 +18,38 @@ from crewai.llm import LLM
 
 from search_tool import duckduckgo_search
 
-# The Groq model requested for this project.
-# CrewAI routes non-OpenAI models through LiteLLM, so Groq models
-# need the "groq/" prefix in front of the model name.
+
+# Current Groq model
 GROQ_MODEL = "groq/openai/gpt-oss-120b"
 
 
 def build_research_crew(topic: str) -> Crew:
-    """Builds (but does not run) a single-agent Crew that researches `topic`."""
+    """Build the research crew for the given topic."""
+
+    api_key = os.environ.get("GROQ_API_KEY")
+
+    if not api_key:
+        raise ValueError(
+            "GROQ_API_KEY is not set. Please add your Groq API key "
+            "in Streamlit Secrets."
+        )
 
     llm = LLM(
         model=GROQ_MODEL,
-        api_key=os.environ.get("GROQ_API_KEY"),
+        api_key=api_key,
         temperature=0.4,
     )
 
     researcher = Agent(
         role="Senior Research Analyst",
         goal=(
-            f"Research the topic '{topic}' using web search, and produce an accurate, "
-            "clearly written, well-organized report."
+            f"Research the topic '{topic}' using web search and produce "
+            "an accurate, clearly written and well-organized report."
         ),
         backstory=(
-            "You are a meticulous research analyst. You are excellent at using web "
-            "search to gather current, factual information, cross-checking claims "
-            "across multiple sources, and turning your findings into a report that "
-            "a busy reader can quickly understand."
+            "You are a careful research analyst who searches the web, "
+            "checks information from multiple sources and creates "
+            "clear research reports."
         ),
         tools=[duckduckgo_search],
         llm=llm,
@@ -50,22 +59,28 @@ def build_research_crew(topic: str) -> Crew:
 
     research_task = Task(
         description=(
-            f"Research the topic: '{topic}'.\n\n"
-            "Steps to follow:\n"
-            "1. Use the DuckDuckGo Search tool at least 2-3 times with different, "
-            "specific search queries to gather current and relevant information.\n"
-            "2. Cross-check important facts against more than one search result "
-            "where possible.\n"
-            "3. Write a clear, well-structured report in Markdown containing:\n"
-            "   - A short introduction to the topic\n"
-            "   - 3-5 sections with headings covering the key findings\n"
-            "   - A brief conclusion / summary\n\n"
-            "Only include information you found through search. If something is "
-            "uncertain or sources disagree, say so plainly instead of guessing."
+            f"Research the following topic: '{topic}'.\n\n"
+
+            "Follow these steps:\n"
+            "1. Use the web search tool multiple times with different "
+            "specific search queries.\n"
+            "2. Gather current and relevant information.\n"
+            "3. Cross-check important facts when possible.\n"
+            "4. Do not invent information.\n"
+            "5. If sources disagree or information is uncertain, "
+            "clearly mention the uncertainty.\n\n"
+
+            "Write the final report in Markdown with:\n"
+            "- A clear title\n"
+            "- A short introduction\n"
+            "- 3-5 sections with headings\n"
+            "- Important findings\n"
+            "- A short conclusion\n"
+            "- Sources or URLs used during research"
         ),
         expected_output=(
-            "A well-structured Markdown report, roughly 400-700 words, with a title, "
-            "an introduction, a few clearly headed sections, and a short conclusion."
+            "A clear and well-structured Markdown research report "
+            "of approximately 400-700 words."
         ),
         agent=researcher,
     )
@@ -78,3 +93,5 @@ def build_research_crew(topic: str) -> Crew:
     )
 
     return crew
+```
+
